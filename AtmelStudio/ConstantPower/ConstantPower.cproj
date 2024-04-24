@@ -168,6 +168,12 @@
     <Compile Include="myDrivers\dac.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="myDrivers\i2c.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="myDrivers\i2c.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="myDrivers\lcd.c">
       <SubType>compile</SubType>
     </Compile>

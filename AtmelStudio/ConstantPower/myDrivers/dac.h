@@ -16,8 +16,7 @@
 #define SCK		PORTB5
 #define LDAC	PORTB0
 
-void dac_init(void);
-void dac_write(uint16_t * data);
+void dac_write(uint8_t channel, uint16_t data);
 
 
 #endif /* DAC_H_ */

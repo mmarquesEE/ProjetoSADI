@@ -8,6 +8,8 @@ myDrivers\adc.c
 
 myDrivers\dac.c
 
+myDrivers\i2c.c
+
 myDrivers\lcd.c
 
 myDrivers\usart.c

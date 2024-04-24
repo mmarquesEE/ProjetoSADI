@@ -10,9 +10,13 @@
 #define UTILS_H_
 
 
-#include <stdio.h>
-
-void parse_cmd(volatile uint8_t *cmd, uint8_t *mode_out, int8_t *level_out);
+int parse_commands(
+	char *input,
+	volatile char * ch_mode,
+	volatile uint16_t * ch_lvl,
+	volatile uint16_t ch_list[][2][2],
+	volatile uint8_t * start_list
+);
 
 
 #endif /* UTILS_H_ */
