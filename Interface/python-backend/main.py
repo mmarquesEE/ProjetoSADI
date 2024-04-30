@@ -26,7 +26,6 @@ async def server():
         try:
             message = await socket.recv()  # Assíncrono, não bloqueante
             data = json.loads(message.decode('utf-8'))
-            print(data)
             response = {}
 
             if data["cmd"] == "connect":
@@ -93,10 +92,9 @@ async def publisher():
                     "LVL1": int(lvl1),
                     "LVL2": int(lvl2)
                 })
-                print(reading)
             except Exception as e:
                 print(e)
-        await asyncio.sleep(0.1)  # Um breve delay para não sobrecarregar o loop
+        await asyncio.sleep(0.01)  # Um breve delay para não sobrecarregar o loop
 
 async def main():
     print("Both services are running indefinitely. Press Ctrl+C to stop.")

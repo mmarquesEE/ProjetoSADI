@@ -35,18 +35,14 @@ subs.subscribe("");
 
 function setupIpcListeners() {
     ipcMain.handle("send-json", async (event, args) => {
-        console.log("Sending JSON to Python", args);
         await client.send(JSON.stringify(args));
         const [reply] = await client.receive();
-        console.log("Reply received from server:", reply.toString());
         return JSON.parse(reply.toString());
     });
 }
 
 async function setupZmqSubscriptions() {
     for await (const [reading] of subs) {
-        console.log(reading.toString());
-        // Convertendo a mensagem de JSON para objeto
         let msgData;
         try {
             msgData = JSON.parse(reading.toString());
