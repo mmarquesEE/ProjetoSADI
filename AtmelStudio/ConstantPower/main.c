@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#define F_CPU 16000000UL
+#define F_CPU 8000000UL
 
 #include <util/delay.h>
 #include "myDrivers/i2c.h"
@@ -35,7 +35,7 @@ volatile uint8_t confirm = 0;
 // Asynchronously receive set point and config ----------------------
 volatile char ch_mode[2] = {'I','I'};
 volatile uint16_t ch_lvl[2] = {0,0};
-volatile uint16_t ch_list[30][2][2] = {0};
+volatile uint32_t ch_list[30][2][2] = {0};
 volatile uint8_t start_list[2] = {0,0};
 
 #define CMD_MAX_SIZE 311
@@ -49,8 +49,7 @@ ISR(USART_RX_vect)
 	
 	if (((cmd[cmd_count - 1] == ';') && cmd_count > 1) || (cmd_count >= CMD_MAX_SIZE)) {
 		cmd[cmd_count] = '\0';
-
-		if (cmd[0] == ';' && parse_commands(cmd, ch_mode, ch_lvl, ch_list, start_list)) {
+		if (parse_commands(cmd, ch_mode, ch_lvl, ch_list, start_list) == 0) {
 			current_page = 0;
 			confirm = 0;
 			update_display();
@@ -64,7 +63,7 @@ ISR(USART_RX_vect)
 
 #define IMAX 1.68
 #define PMAX IMAX*8
-#define SAMPLE_TIME 10
+#define SAMPLE_TIME 100
 
 volatile float I[2] = {0,0};
 volatile float V[2] = {0,0};
@@ -72,9 +71,32 @@ volatile float V[2] = {0,0};
 ISR(TIMER0_COMPA_vect)
 {
 	static uint16_t timer0_counter = SAMPLE_TIME;
+	static uint32_t time_count = 0;
+	static uint8_t cycle_count[2] = {0};
+	static uint8_t list_count[2] = {0};
 	
 	if (timer0_counter == SAMPLE_TIME){
+		if(start_list[0] || start_list[1])
+			time_count ++;
+		else time_count = 0;
+		
 		for(uint8_t i=0; i<2; i++){
+			if(start_list[i]){
+				if(ch_list[list_count[i]][1][i] != 0){
+					if(cycle_count[i] >= ch_list[list_count[i]][1][i]){
+							ch_lvl[i] = (uint16_t) ch_list[list_count[i]][0][i];
+							list_count[i]++;
+							cycle_count[i] = 0;
+					} else cycle_count[i]++;
+				} else {
+					char * str = "STOP LIST ( );";
+					sprintf(str,"STOP LIST (%d);",i);
+					parse_commands(str,ch_mode,ch_lvl,ch_list,start_list);
+					cycle_count[i] = 0;
+					list_count[i] = 0;
+				}
+			}
+			
 			// Read ADC channel i:
 			uint16_t adcval = adc_read(i);
 			V[i] = (((float) adcval)/1023.0) * (3.0 * 5.0);
@@ -89,6 +111,12 @@ ISR(TIMER0_COMPA_vect)
 			dac_write(i,(uint16_t)(dacval > 4095.0 ? 4095.0 : dacval));
 		}
 		level_sel = adc_read(2);
+		
+		char readings[50] = {0};
+		sprintf(readings,"%lu,%4.1f,%4.1f,%4.2f,%4.2f,%c,%c,%d,%d\n",
+			time_count,V[0],V[1],I[0],I[1],ch_mode[0],ch_mode[1],ch_lvl[0],ch_lvl[1]);
+		usart_writeline(readings);
+		
 		update_display();
 		timer0_counter = 0; return;
 	}

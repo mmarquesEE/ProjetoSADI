@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include "lcd.h"
 
-#define F_CPU 16000000UL
+#define F_CPU 8000000UL
 #include <util/delay.h>
 
 void lcd_toggle(void)

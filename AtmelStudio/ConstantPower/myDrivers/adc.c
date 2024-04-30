@@ -14,7 +14,7 @@ void adc_init(void)
 	/* ADC Frequency:
 	F = 16MHz / 128 = 125 kHz
 	*/
-	ADCSRA |= (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
+	ADCSRA |= (1<<ADPS2) | (1<<ADPS1);
 	
 	// Enable ADC and start conversion
 	ADCSRA |= (1<<ADEN) | (1<<ADSC);

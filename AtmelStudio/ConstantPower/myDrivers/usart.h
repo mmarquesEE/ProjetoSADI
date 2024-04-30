@@ -14,9 +14,9 @@
 extern unsigned long f_cpu;
 
 void usart_init(void);
-void usart_write(uint8_t data);
+void usart_write(char data);
 uint8_t usart_read(void);
-void usart_flush(void);
+void usart_writeline(char *data);
 
 
 #endif /* USART_H_ */

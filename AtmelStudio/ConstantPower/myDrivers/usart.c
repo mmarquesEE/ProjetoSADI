@@ -25,15 +25,34 @@ void usart_init(void)
 	UCSR0C = (1<<USBS0)|(3<<UCSZ00);
 }
 
-void usart_write(uint8_t data)
+void usart_write(char data)
 {
+	/* Wait for empty transmit buffer */
+	while (!(UCSR0A & (1<<UDRE0)));
+	
 	/* Put data into buffer, sends the data */
 	UDR0 = data;
 }
 
 uint8_t usart_read(void)
 {
+	while (!(UCSR0A & (1<<RXC0)));
+	
 	/* Get and return received data from buffer */
 	return UDR0;
+}
+
+void usart_writeline(char *data)
+{
+	uint8_t data_count = 0;
+	while(data[data_count] != '\0'){
+		usart_write(data[data_count++]);
+	}
+}
+
+void usart_flush(void)
+{
+	unsigned char dummy;
+	while (UCSR0A & (1<<RXC0)) dummy = UDR0;
 }
 
