@@ -21,9 +21,6 @@ function App() {
     const [playing, setPlaying] = useState(false);
     const [dataAvailable, setDataAvailable] = useState(false);
 
-    const IMAX = 1.68;
-    const PMAX = 8.0 * IMAX;
-
     useEffect(() => {
         const zmqListener = (event, data) => {
             console.log("Received ZMQ message:", data);
@@ -146,15 +143,9 @@ function App() {
                                 channel={idx + 1}
                                 mode={mode}
                                 onModeToggle={() => {
-                                    let val = mode;
-                                    if (mode[idx] == "I") {
-                                        val[idx] = "P";
+                                    if (mode[idx] == "I")
                                         setChannelMode(idx + 1, "P");
-                                    } else {
-                                        val[idx] = "I";
-                                        setChannelMode(idx + 1, "I");
-                                    }
-                                    setMode(val);
+                                    else setChannelMode(idx + 1, "I");
                                 }}
                                 level={level}
                                 onLevelChange={(e) => {

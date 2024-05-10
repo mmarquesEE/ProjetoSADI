@@ -200,7 +200,7 @@ async def publisher():
                     "M1": m1,
                     "M2": m2,
                     "LVL1": float(lvl1)/Q_NUMBER * (IMAX if m1 == 'I' else PMAX),
-                    "LVL2": float(lvl2)/Q_NUMBER * (IMAX if m1 == 'I' else PMAX),
+                    "LVL2": float(lvl2)/Q_NUMBER * (IMAX if m2 == 'I' else PMAX),
                     "SYNC": int(sync),
                     "PLAYING": playing,
                     "DATA": data_available
