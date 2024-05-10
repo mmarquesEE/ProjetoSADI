@@ -5,10 +5,7 @@
  *  Author: mmarq
  */ 
 
-#include <avr/io.h>
-#include <util/twi.h>
-
-#define F_CPU 8000000UL
+#include "i2c.h"
 
 void i2c_init(unsigned long fscl)
 {

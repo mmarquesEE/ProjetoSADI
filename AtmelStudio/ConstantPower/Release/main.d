@@ -17,7 +17,7 @@ main.d main.o: .././main.c \
  .././myDrivers/i2c.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\twi.h \
  .././myDrivers/adc.h .././myDrivers/dac.h .././myDrivers/usart.h \
- .././myDrivers/utils.h .././myDrivers/lcd.h \
+ .././myDrivers/lcd.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h \
@@ -62,8 +62,6 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././myDrivers/dac.h:
 
 .././myDrivers/usart.h:
-
-.././myDrivers/utils.h:
 
 .././myDrivers/lcd.h:
 

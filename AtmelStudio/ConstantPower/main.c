@@ -8,62 +8,70 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#define F_CPU 8000000UL
+#define F_CPU 16000000UL
 
 #include <util/delay.h>
 #include "myDrivers/i2c.h"
 #include "myDrivers/adc.h"
 #include "myDrivers/dac.h"
 #include "myDrivers/usart.h"
-#include "myDrivers/utils.h"
 #include "myDrivers/lcd.h"
 #include <string.h>
 #include <stdio.h>
 
-unsigned long f_cpu = F_CPU;
 void update_display(void);
 void timer0_init(void);
 void extint_init(void);
 
+#define Q_NUMBER 120 // Needs to be less than 125
+#define IMAX 2.0
+#define PMAX 10.0
+
+#define EVENT_O 0
+#define EVENT_P Q_NUMBER + 1
+#define EVENT_I Q_NUMBER + 3
+#define EVENT_S Q_NUMBER + 5
+#define EVENT_A Q_NUMBER + 7
+
 // Menu related variables
 volatile uint8_t channel_sel = 0;
 volatile char mode_sel = 0;
-volatile uint16_t level_sel = 0;
+volatile uint8_t level_sel = 0;
 volatile uint8_t current_page = 0;
 volatile uint8_t confirm = 0;
 
 // Asynchronously receive set point and config ----------------------
 volatile char ch_mode[2] = {'I','I'};
-volatile uint16_t ch_lvl[2] = {0,0};
-volatile uint32_t ch_list[30][2][2] = {0};
-volatile uint8_t start_list[2] = {0,0};
-
-#define CMD_MAX_SIZE 311
+volatile uint8_t ch_lvl[2] = {0,0};
+volatile uint8_t sync;
 
 ISR(USART_RX_vect)
 {
-	static char cmd[CMD_MAX_SIZE] = {0};
-	static uint16_t cmd_count = 0;
+	uint8_t cmd = usart_read();
+	uint8_t channel[2] = {0};
+	channel[0] = (cmd & 0x80) >> 7;
+	channel[1] = channel[0] == 0 ? 1:0;
+	uint8_t data = 0x7f & cmd;
 	
-	cmd[cmd_count++] = usart_read();
-	
-	if (((cmd[cmd_count - 1] == ';') && cmd_count > 1) || (cmd_count >= CMD_MAX_SIZE)) {
-		cmd[cmd_count] = '\0';
-		if (parse_commands(cmd, ch_mode, ch_lvl, ch_list, start_list) == 0) {
-			current_page = 0;
-			confirm = 0;
-			update_display();
+	if(data == EVENT_S || data == EVENT_A){
+		sync = (data == EVENT_S ? 1:0);
+	}else{
+		for(uint8_t i=0;i<=sync;i++){
+			if(data > 0 && data < Q_NUMBER)
+				ch_lvl[channel[i]] = data;
+			else if(data == EVENT_P || data == EVENT_I || data == EVENT_O){
+				if(data != EVENT_O)
+					ch_mode[channel[i]] = (data == EVENT_P ? 'P':'I');
+				
+				ch_lvl[channel[i]] = 0;
+			}
 		}
-		cmd_count = 0;
 	}
 }
 // ------------------------------------------------------------------
 
 // Periodically control current -------------------------------------
-
-#define IMAX 1.68
-#define PMAX IMAX*8
-#define SAMPLE_TIME 100
+#define SAMPLE_TIME 10
 
 volatile float I[2] = {0,0};
 volatile float V[2] = {0,0};
@@ -71,50 +79,28 @@ volatile float V[2] = {0,0};
 ISR(TIMER0_COMPA_vect)
 {
 	static uint16_t timer0_counter = SAMPLE_TIME;
-	static uint32_t time_count = 0;
-	static uint8_t cycle_count[2] = {0};
-	static uint8_t list_count[2] = {0};
+	static char readings[50] = {0};
 	
 	if (timer0_counter == SAMPLE_TIME){
-		if(start_list[0] || start_list[1])
-			time_count ++;
-		else time_count = 0;
-		
 		for(uint8_t i=0; i<2; i++){
-			if(start_list[i]){
-				if(ch_list[list_count[i]][1][i] != 0){
-					if(cycle_count[i] >= ch_list[list_count[i]][1][i]){
-							ch_lvl[i] = (uint16_t) ch_list[list_count[i]][0][i];
-							list_count[i]++;
-							cycle_count[i] = 0;
-					} else cycle_count[i]++;
-				} else {
-					char * str = "STOP LIST ( );";
-					sprintf(str,"STOP LIST (%d);",i);
-					parse_commands(str,ch_mode,ch_lvl,ch_list,start_list);
-					cycle_count[i] = 0;
-					list_count[i] = 0;
-				}
-			}
-			
 			// Read ADC channel i:
 			uint16_t adcval = adc_read(i);
 			V[i] = (((float) adcval)/1023.0) * (3.0 * 5.0);
 			
 			// Compute control signal:
 			if(ch_mode[i] == 'P')
-				I[i] = (((float) ch_lvl[i])/1023.0)*(PMAX/V[i]);
+				I[i] = (((float) ch_lvl[i])/((float) Q_NUMBER))*(PMAX/V[i]);
 			else
-				I[i] = (((float) ch_lvl[i])/1023.0)*IMAX;
+				I[i] = (((float) ch_lvl[i])/((float) Q_NUMBER))*IMAX;
 				
 			uint32_t dacval = (uint32_t) (3.0*I[i]/5.0 * 4095.0);
 			dac_write(i,(uint16_t)(dacval > 4095.0 ? 4095.0 : dacval));
 		}
-		level_sel = adc_read(2);
+		float temp = ((((float) adc_read(2))/1023.0)*((float) Q_NUMBER));
+		level_sel = (uint8_t) (temp > Q_NUMBER ? Q_NUMBER : temp);
 		
-		char readings[50] = {0};
-		sprintf(readings,"%lu,%4.1f,%4.1f,%4.2f,%4.2f,%c,%c,%d,%d\n",
-			time_count,V[0],V[1],I[0],I[1],ch_mode[0],ch_mode[1],ch_lvl[0],ch_lvl[1]);
+		sprintf(readings,"%4.1f,%4.1f,%4.2f,%4.2f,%c,%c,%d,%d,%d\n",
+			V[0],V[1],I[0],I[1],ch_mode[0],ch_mode[1],ch_lvl[0],ch_lvl[1],sync);
 		usart_writeline(readings);
 		
 		update_display();
@@ -128,38 +114,30 @@ ISR(TIMER0_COMPA_vect)
 
 ISR(INT0_vect)
 {	
-	if(start_list[0] || start_list[1]){
-		parse_commands("STOP LIST;",ch_mode,ch_lvl,ch_list,start_list);
-	} else {
-		switch(current_page){
-			case 0:
-				channel_sel = channel_sel ? 0:1;
-				break;
-			case 1:
-				mode_sel = mode_sel == 'I'? 'P':'I';
-				break;
-			case 2:
-				confirm = confirm ? 0:1;
-				break;
-		}
+	switch(current_page){
+		case 0:
+			channel_sel = channel_sel ? 0:1;
+			break;
+		case 1:
+			mode_sel = mode_sel == 'I'? 'P':'I';
+			break;
+		case 2:
+			confirm = confirm ? 0:1;
+			break;
 	}
 	update_display();
 }
 
 ISR(INT1_vect)
 {
-	if(start_list[0] || start_list[1]){
-		parse_commands("STOP LIST;",ch_mode,ch_lvl,ch_list,start_list);
-	} else {
-		current_page++;
-		if(current_page > 2){
-			if(confirm){
-				ch_mode[channel_sel] = mode_sel;
-				ch_lvl[channel_sel] = level_sel;
-			}
-			current_page = 0;
-			confirm = 0;
+	current_page++;
+	if(current_page > 2){
+		if(confirm){
+			ch_mode[channel_sel] = mode_sel;
+			ch_lvl[channel_sel] = level_sel;
 		}
+		current_page = 0;
+		confirm = 0;
 	}
 	update_display();
 }
@@ -181,10 +159,10 @@ int main(void)
 	
 	mode_sel = ch_mode[channel_sel];
 	level_sel = ch_lvl[channel_sel];
-		
+	
 	while(1){
-		PORTC |=  (1<<LED); _delay_ms(500);
-		PORTC &= ~(1<<LED); _delay_ms(500);
+		PORTC |=  (1<<LED); _delay_ms(250);
+		PORTC &= ~(1<<LED); _delay_ms(250);
 	}
 }
 
@@ -196,13 +174,11 @@ void update_display(void)
 	switch(current_page){
 		case 0:
 			for (uint8_t i=0; i < 2; i++){
-				sprintf(line[i],"%c%c%cC%d %c %5.2f %c (%5.2fV  %5.2fA)",
-					start_list[i] ? ' ':'(',
-					start_list[i] ? ' ':(channel_sel == i ? '*':' '),
-					start_list[i] ? ' ':')',
+				sprintf(line[i],"(%c)C%d %c %5.2f %c (%5.2fV  %5.2fA)",
+					channel_sel == i ? '*':' ',
 					i+1,
 					ch_mode[i],
-					((float) ch_lvl[i]/1023.0)*(ch_mode[i] == 'I'? IMAX:PMAX),
+					((float) ch_lvl[i]/((float) Q_NUMBER))*(ch_mode[i] == 'I'? IMAX:PMAX),
 					ch_mode[i] == 'I' ? 'A':'W',
 					V[i],I[i]
 				);
@@ -214,12 +190,12 @@ void update_display(void)
 			sprintf(line[0],"CHANNEL %d| MODE: %c  LVL: %5.2f %c",
 				channel_sel+1,
 				ch_mode[channel_sel],
-				((float) ch_lvl[channel_sel]/1023.0)*(ch_mode[channel_sel] == 'I' ? IMAX:PMAX),
+				((float) ch_lvl[channel_sel]/((float) Q_NUMBER))*(ch_mode[channel_sel] == 'I' ? IMAX:PMAX),
 				ch_mode[channel_sel] == 'I' ? 'A':'W'
 			);
 			sprintf(line[1],"NEW: MODE %c | LEVEL %5.2f %c",
 				mode_sel,
-				((float) level_sel/1023.0)*(mode_sel == 'I' ? IMAX:PMAX),
+				((float) level_sel/((float) Q_NUMBER))*(mode_sel == 'I' ? IMAX:PMAX),
 				mode_sel == 'I' ? 'A':'W'
 			);
 			lcd_set_position(0,0);lcd_write_string(line[0]);

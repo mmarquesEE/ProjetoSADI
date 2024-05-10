@@ -14,7 +14,7 @@
 
 static int parse_set_mode(
 	char *params,
-	volatile char *ch_mode,
+	volatile char ch_mode[],
 	volatile uint16_t ch_lvl[2]
 ) {
 	int channel1 = -1, channel2 = -1;
@@ -49,7 +49,7 @@ static int parse_set_mode(
 
 static int parse_set_level(
 	char *params,
-	volatile uint16_t *ch_lvl
+	volatile uint16_t ch_lvl[]
 ) {
 	int channel1 = -1, channel2 = -1;
 	int value1, value2;
@@ -164,7 +164,7 @@ static int parse_set_list(
 
 static int parse_start_stop(
 	char *command,
-	volatile uint8_t *start_list,
+	volatile uint8_t start_list[2],
 	volatile uint16_t ch_lvl[2]
 ) {
 	char *params = strchr(command, '(');
@@ -197,10 +197,10 @@ static int parse_start_stop(
 
 int parse_commands(
 	char *input,
-	volatile char * ch_mode,
-	volatile uint16_t * ch_lvl,
+	volatile char ch_mode[2],
+	volatile uint16_t ch_lvl[2],
 	volatile uint32_t ch_list[MAX_LIST_LEN][2][2],
-	volatile uint8_t * start_list
+	volatile uint8_t start_list[2]
 )
 {
 	if (input[strlen(input) - 1] != ';')

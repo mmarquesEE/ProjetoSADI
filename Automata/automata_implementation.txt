@@ -1,0 +1,257 @@
+#include <stdio.h>
+
+#define IGNORE_EVENT -1
+
+typedef enum {
+	parallel_I_I_OFF_OFF_A,
+	parallel_I_I_OFF_OFF_S,
+	parallel_I_I_OFF_ON_A,
+	parallel_I_I_OFF_ON_S,
+	parallel_I_I_ON_OFF_A,
+	parallel_I_I_ON_OFF_S,
+	parallel_I_I_ON_ON_A,
+	parallel_I_I_ON_ON_S,
+	parallel_I_P_OFF_OFF_A,
+	parallel_I_P_OFF_OFF_S,
+	parallel_I_P_OFF_ON_A,
+	parallel_I_P_OFF_ON_S,
+	parallel_I_P_ON_OFF_A,
+	parallel_I_P_ON_OFF_S,
+	parallel_I_P_ON_ON_A,
+	parallel_I_P_ON_ON_S,
+	parallel_P_I_OFF_OFF_A,
+	parallel_P_I_OFF_OFF_S,
+	parallel_P_I_OFF_ON_A,
+	parallel_P_I_OFF_ON_S,
+	parallel_P_I_ON_OFF_A,
+	parallel_P_I_ON_OFF_S,
+	parallel_P_I_ON_ON_A,
+	parallel_P_I_ON_ON_S,
+	parallel_P_P_OFF_OFF_A,
+	parallel_P_P_OFF_OFF_S,
+	parallel_P_P_OFF_ON_A,
+	parallel_P_P_OFF_ON_S,
+	parallel_P_P_ON_OFF_A,
+	parallel_P_P_ON_OFF_S,
+	parallel_P_P_ON_ON_A,
+	parallel_P_P_ON_ON_S,
+	NUM_parallel_STATES
+} State_parallel;
+
+typedef enum {
+	parallel_EVENT_A,
+	parallel_EVENT_I0,
+	parallel_EVENT_I1,
+	parallel_EVENT_L0,
+	parallel_EVENT_L1,
+	parallel_EVENT_O0,
+	parallel_EVENT_O1,
+	parallel_EVENT_P0,
+	parallel_EVENT_P1,
+	parallel_EVENT_S,
+	NUM_parallel_EVENTS
+} Event_parallel;
+
+State_parallel transition_table_parallel[NUM_parallel_STATES][NUM_parallel_EVENTS];
+
+void initialize_transition_table_parallel() {
+	for (int i = 0; i < NUM_parallel_STATES; i++) {
+		for (int j = 0; j < NUM_parallel_EVENTS; j++) {
+			transition_table_parallel[i][j] = IGNORE_EVENT;
+		}
+	}
+
+	transition_table_parallel[parallel_I_I_OFF_OFF_A][parallel_EVENT_L0] = parallel_I_I_ON_OFF_A;
+	transition_table_parallel[parallel_I_I_OFF_OFF_A][parallel_EVENT_L1] = parallel_I_I_OFF_ON_A;
+	transition_table_parallel[parallel_I_I_OFF_OFF_A][parallel_EVENT_P0] = parallel_P_I_OFF_OFF_A;
+	transition_table_parallel[parallel_I_I_OFF_OFF_A][parallel_EVENT_P1] = parallel_I_P_OFF_OFF_A;
+	transition_table_parallel[parallel_I_I_OFF_OFF_A][parallel_EVENT_S] = parallel_I_I_OFF_OFF_S;
+	transition_table_parallel[parallel_I_I_OFF_OFF_S][parallel_EVENT_A] = parallel_I_I_OFF_OFF_A;
+	transition_table_parallel[parallel_I_I_OFF_OFF_S][parallel_EVENT_L0] = parallel_I_I_ON_OFF_S;
+	transition_table_parallel[parallel_I_I_OFF_OFF_S][parallel_EVENT_L1] = parallel_I_I_OFF_ON_S;
+	transition_table_parallel[parallel_I_I_OFF_OFF_S][parallel_EVENT_P0] = parallel_P_I_OFF_OFF_S;
+	transition_table_parallel[parallel_I_I_OFF_OFF_S][parallel_EVENT_P1] = parallel_I_P_OFF_OFF_S;
+	transition_table_parallel[parallel_I_I_OFF_ON_A][parallel_EVENT_L0] = parallel_I_I_ON_ON_A;
+	transition_table_parallel[parallel_I_I_OFF_ON_A][parallel_EVENT_L1] = parallel_I_I_OFF_ON_A;
+	transition_table_parallel[parallel_I_I_OFF_ON_A][parallel_EVENT_O1] = parallel_I_I_OFF_OFF_A;
+	transition_table_parallel[parallel_I_I_OFF_ON_A][parallel_EVENT_P0] = parallel_P_I_OFF_ON_A;
+	transition_table_parallel[parallel_I_I_OFF_ON_A][parallel_EVENT_P1] = parallel_I_P_OFF_OFF_A;
+	transition_table_parallel[parallel_I_I_OFF_ON_A][parallel_EVENT_S] = parallel_I_I_OFF_ON_S;
+	transition_table_parallel[parallel_I_I_OFF_ON_S][parallel_EVENT_A] = parallel_I_I_OFF_ON_A;
+	transition_table_parallel[parallel_I_I_OFF_ON_S][parallel_EVENT_L0] = parallel_I_I_ON_ON_S;
+	transition_table_parallel[parallel_I_I_OFF_ON_S][parallel_EVENT_L1] = parallel_I_I_OFF_ON_S;
+	transition_table_parallel[parallel_I_I_OFF_ON_S][parallel_EVENT_O1] = parallel_I_I_OFF_OFF_S;
+	transition_table_parallel[parallel_I_I_OFF_ON_S][parallel_EVENT_P0] = parallel_P_I_OFF_ON_S;
+	transition_table_parallel[parallel_I_I_OFF_ON_S][parallel_EVENT_P1] = parallel_I_P_OFF_OFF_S;
+	transition_table_parallel[parallel_I_I_ON_OFF_A][parallel_EVENT_L0] = parallel_I_I_ON_OFF_A;
+	transition_table_parallel[parallel_I_I_ON_OFF_A][parallel_EVENT_L1] = parallel_I_I_ON_ON_A;
+	transition_table_parallel[parallel_I_I_ON_OFF_A][parallel_EVENT_O0] = parallel_I_I_OFF_OFF_A;
+	transition_table_parallel[parallel_I_I_ON_OFF_A][parallel_EVENT_P0] = parallel_P_I_OFF_OFF_A;
+	transition_table_parallel[parallel_I_I_ON_OFF_A][parallel_EVENT_P1] = parallel_I_P_ON_OFF_A;
+	transition_table_parallel[parallel_I_I_ON_OFF_A][parallel_EVENT_S] = parallel_I_I_ON_OFF_S;
+	transition_table_parallel[parallel_I_I_ON_OFF_S][parallel_EVENT_A] = parallel_I_I_ON_OFF_A;
+	transition_table_parallel[parallel_I_I_ON_OFF_S][parallel_EVENT_L0] = parallel_I_I_ON_OFF_S;
+	transition_table_parallel[parallel_I_I_ON_OFF_S][parallel_EVENT_L1] = parallel_I_I_ON_ON_S;
+	transition_table_parallel[parallel_I_I_ON_OFF_S][parallel_EVENT_O0] = parallel_I_I_OFF_OFF_S;
+	transition_table_parallel[parallel_I_I_ON_OFF_S][parallel_EVENT_P0] = parallel_P_I_OFF_OFF_S;
+	transition_table_parallel[parallel_I_I_ON_OFF_S][parallel_EVENT_P1] = parallel_I_P_ON_OFF_S;
+	transition_table_parallel[parallel_I_I_ON_ON_A][parallel_EVENT_L0] = parallel_I_I_ON_ON_A;
+	transition_table_parallel[parallel_I_I_ON_ON_A][parallel_EVENT_L1] = parallel_I_I_ON_ON_A;
+	transition_table_parallel[parallel_I_I_ON_ON_A][parallel_EVENT_O0] = parallel_I_I_OFF_ON_A;
+	transition_table_parallel[parallel_I_I_ON_ON_A][parallel_EVENT_O1] = parallel_I_I_ON_OFF_A;
+	transition_table_parallel[parallel_I_I_ON_ON_A][parallel_EVENT_P0] = parallel_P_I_OFF_ON_A;
+	transition_table_parallel[parallel_I_I_ON_ON_A][parallel_EVENT_P1] = parallel_I_P_ON_OFF_A;
+	transition_table_parallel[parallel_I_I_ON_ON_A][parallel_EVENT_S] = parallel_I_I_ON_ON_S;
+	transition_table_parallel[parallel_I_I_ON_ON_S][parallel_EVENT_A] = parallel_I_I_ON_ON_A;
+	transition_table_parallel[parallel_I_I_ON_ON_S][parallel_EVENT_L0] = parallel_I_I_ON_ON_S;
+	transition_table_parallel[parallel_I_I_ON_ON_S][parallel_EVENT_L1] = parallel_I_I_ON_ON_S;
+	transition_table_parallel[parallel_I_I_ON_ON_S][parallel_EVENT_O0] = parallel_I_I_OFF_ON_S;
+	transition_table_parallel[parallel_I_I_ON_ON_S][parallel_EVENT_O1] = parallel_I_I_ON_OFF_S;
+	transition_table_parallel[parallel_I_I_ON_ON_S][parallel_EVENT_P0] = parallel_P_I_OFF_ON_S;
+	transition_table_parallel[parallel_I_I_ON_ON_S][parallel_EVENT_P1] = parallel_I_P_ON_OFF_S;
+	transition_table_parallel[parallel_I_P_OFF_OFF_A][parallel_EVENT_I1] = parallel_I_I_OFF_OFF_A;
+	transition_table_parallel[parallel_I_P_OFF_OFF_A][parallel_EVENT_L0] = parallel_I_P_ON_OFF_A;
+	transition_table_parallel[parallel_I_P_OFF_OFF_A][parallel_EVENT_L1] = parallel_I_P_OFF_ON_A;
+	transition_table_parallel[parallel_I_P_OFF_OFF_A][parallel_EVENT_P0] = parallel_P_P_OFF_OFF_A;
+	transition_table_parallel[parallel_I_P_OFF_OFF_A][parallel_EVENT_S] = parallel_I_P_OFF_OFF_S;
+	transition_table_parallel[parallel_I_P_OFF_OFF_S][parallel_EVENT_A] = parallel_I_P_OFF_OFF_A;
+	transition_table_parallel[parallel_I_P_OFF_OFF_S][parallel_EVENT_I1] = parallel_I_I_OFF_OFF_S;
+	transition_table_parallel[parallel_I_P_OFF_OFF_S][parallel_EVENT_L0] = parallel_I_P_ON_OFF_S;
+	transition_table_parallel[parallel_I_P_OFF_OFF_S][parallel_EVENT_L1] = parallel_I_P_OFF_ON_S;
+	transition_table_parallel[parallel_I_P_OFF_OFF_S][parallel_EVENT_P0] = parallel_P_P_OFF_OFF_S;
+	transition_table_parallel[parallel_I_P_OFF_ON_A][parallel_EVENT_I1] = parallel_I_I_OFF_OFF_A;
+	transition_table_parallel[parallel_I_P_OFF_ON_A][parallel_EVENT_L0] = parallel_I_P_ON_ON_A;
+	transition_table_parallel[parallel_I_P_OFF_ON_A][parallel_EVENT_L1] = parallel_I_P_OFF_ON_A;
+	transition_table_parallel[parallel_I_P_OFF_ON_A][parallel_EVENT_O1] = parallel_I_P_OFF_OFF_A;
+	transition_table_parallel[parallel_I_P_OFF_ON_A][parallel_EVENT_P0] = parallel_P_P_OFF_ON_A;
+	transition_table_parallel[parallel_I_P_OFF_ON_A][parallel_EVENT_S] = parallel_I_P_OFF_ON_S;
+	transition_table_parallel[parallel_I_P_OFF_ON_S][parallel_EVENT_A] = parallel_I_P_OFF_ON_A;
+	transition_table_parallel[parallel_I_P_OFF_ON_S][parallel_EVENT_I1] = parallel_I_I_OFF_OFF_S;
+	transition_table_parallel[parallel_I_P_OFF_ON_S][parallel_EVENT_L0] = parallel_I_P_ON_ON_S;
+	transition_table_parallel[parallel_I_P_OFF_ON_S][parallel_EVENT_L1] = parallel_I_P_OFF_ON_S;
+	transition_table_parallel[parallel_I_P_OFF_ON_S][parallel_EVENT_O1] = parallel_I_P_OFF_OFF_S;
+	transition_table_parallel[parallel_I_P_OFF_ON_S][parallel_EVENT_P0] = parallel_P_P_OFF_ON_S;
+	transition_table_parallel[parallel_I_P_ON_OFF_A][parallel_EVENT_I1] = parallel_I_I_ON_OFF_A;
+	transition_table_parallel[parallel_I_P_ON_OFF_A][parallel_EVENT_L0] = parallel_I_P_ON_OFF_A;
+	transition_table_parallel[parallel_I_P_ON_OFF_A][parallel_EVENT_L1] = parallel_I_P_ON_ON_A;
+	transition_table_parallel[parallel_I_P_ON_OFF_A][parallel_EVENT_O0] = parallel_I_P_OFF_OFF_A;
+	transition_table_parallel[parallel_I_P_ON_OFF_A][parallel_EVENT_P0] = parallel_P_P_OFF_OFF_A;
+	transition_table_parallel[parallel_I_P_ON_OFF_A][parallel_EVENT_S] = parallel_I_P_ON_OFF_S;
+	transition_table_parallel[parallel_I_P_ON_OFF_S][parallel_EVENT_A] = parallel_I_P_ON_OFF_A;
+	transition_table_parallel[parallel_I_P_ON_OFF_S][parallel_EVENT_I1] = parallel_I_I_ON_OFF_S;
+	transition_table_parallel[parallel_I_P_ON_OFF_S][parallel_EVENT_L0] = parallel_I_P_ON_OFF_S;
+	transition_table_parallel[parallel_I_P_ON_OFF_S][parallel_EVENT_L1] = parallel_I_P_ON_ON_S;
+	transition_table_parallel[parallel_I_P_ON_OFF_S][parallel_EVENT_O0] = parallel_I_P_OFF_OFF_S;
+	transition_table_parallel[parallel_I_P_ON_OFF_S][parallel_EVENT_P0] = parallel_P_P_OFF_OFF_S;
+	transition_table_parallel[parallel_I_P_ON_ON_A][parallel_EVENT_I1] = parallel_I_I_ON_OFF_A;
+	transition_table_parallel[parallel_I_P_ON_ON_A][parallel_EVENT_L0] = parallel_I_P_ON_ON_A;
+	transition_table_parallel[parallel_I_P_ON_ON_A][parallel_EVENT_L1] = parallel_I_P_ON_ON_A;
+	transition_table_parallel[parallel_I_P_ON_ON_A][parallel_EVENT_O0] = parallel_I_P_OFF_ON_A;
+	transition_table_parallel[parallel_I_P_ON_ON_A][parallel_EVENT_O1] = parallel_I_P_ON_OFF_A;
+	transition_table_parallel[parallel_I_P_ON_ON_A][parallel_EVENT_P0] = parallel_P_P_OFF_ON_A;
+	transition_table_parallel[parallel_I_P_ON_ON_A][parallel_EVENT_S] = parallel_I_P_ON_ON_S;
+	transition_table_parallel[parallel_I_P_ON_ON_S][parallel_EVENT_A] = parallel_I_P_ON_ON_A;
+	transition_table_parallel[parallel_I_P_ON_ON_S][parallel_EVENT_I1] = parallel_I_I_ON_OFF_S;
+	transition_table_parallel[parallel_I_P_ON_ON_S][parallel_EVENT_L0] = parallel_I_P_ON_ON_S;
+	transition_table_parallel[parallel_I_P_ON_ON_S][parallel_EVENT_L1] = parallel_I_P_ON_ON_S;
+	transition_table_parallel[parallel_I_P_ON_ON_S][parallel_EVENT_O0] = parallel_I_P_OFF_ON_S;
+	transition_table_parallel[parallel_I_P_ON_ON_S][parallel_EVENT_O1] = parallel_I_P_ON_OFF_S;
+	transition_table_parallel[parallel_I_P_ON_ON_S][parallel_EVENT_P0] = parallel_P_P_OFF_ON_S;
+	transition_table_parallel[parallel_P_I_OFF_OFF_A][parallel_EVENT_I0] = parallel_I_I_OFF_OFF_A;
+	transition_table_parallel[parallel_P_I_OFF_OFF_A][parallel_EVENT_L0] = parallel_P_I_ON_OFF_A;
+	transition_table_parallel[parallel_P_I_OFF_OFF_A][parallel_EVENT_L1] = parallel_P_I_OFF_ON_A;
+	transition_table_parallel[parallel_P_I_OFF_OFF_A][parallel_EVENT_P1] = parallel_P_P_OFF_OFF_A;
+	transition_table_parallel[parallel_P_I_OFF_OFF_A][parallel_EVENT_S] = parallel_P_I_OFF_OFF_S;
+	transition_table_parallel[parallel_P_I_OFF_OFF_S][parallel_EVENT_A] = parallel_P_I_OFF_OFF_A;
+	transition_table_parallel[parallel_P_I_OFF_OFF_S][parallel_EVENT_I0] = parallel_I_I_OFF_OFF_S;
+	transition_table_parallel[parallel_P_I_OFF_OFF_S][parallel_EVENT_L0] = parallel_P_I_ON_OFF_S;
+	transition_table_parallel[parallel_P_I_OFF_OFF_S][parallel_EVENT_L1] = parallel_P_I_OFF_ON_S;
+	transition_table_parallel[parallel_P_I_OFF_OFF_S][parallel_EVENT_P1] = parallel_P_P_OFF_OFF_S;
+	transition_table_parallel[parallel_P_I_OFF_ON_A][parallel_EVENT_I0] = parallel_I_I_OFF_ON_A;
+	transition_table_parallel[parallel_P_I_OFF_ON_A][parallel_EVENT_L0] = parallel_P_I_ON_ON_A;
+	transition_table_parallel[parallel_P_I_OFF_ON_A][parallel_EVENT_L1] = parallel_P_I_OFF_ON_A;
+	transition_table_parallel[parallel_P_I_OFF_ON_A][parallel_EVENT_O1] = parallel_P_I_OFF_OFF_A;
+	transition_table_parallel[parallel_P_I_OFF_ON_A][parallel_EVENT_P1] = parallel_P_P_OFF_OFF_A;
+	transition_table_parallel[parallel_P_I_OFF_ON_A][parallel_EVENT_S] = parallel_P_I_OFF_ON_S;
+	transition_table_parallel[parallel_P_I_OFF_ON_S][parallel_EVENT_A] = parallel_P_I_OFF_ON_A;
+	transition_table_parallel[parallel_P_I_OFF_ON_S][parallel_EVENT_I0] = parallel_I_I_OFF_ON_S;
+	transition_table_parallel[parallel_P_I_OFF_ON_S][parallel_EVENT_L0] = parallel_P_I_ON_ON_S;
+	transition_table_parallel[parallel_P_I_OFF_ON_S][parallel_EVENT_L1] = parallel_P_I_OFF_ON_S;
+	transition_table_parallel[parallel_P_I_OFF_ON_S][parallel_EVENT_O1] = parallel_P_I_OFF_OFF_S;
+	transition_table_parallel[parallel_P_I_OFF_ON_S][parallel_EVENT_P1] = parallel_P_P_OFF_OFF_S;
+	transition_table_parallel[parallel_P_I_ON_OFF_A][parallel_EVENT_I0] = parallel_I_I_OFF_OFF_A;
+	transition_table_parallel[parallel_P_I_ON_OFF_A][parallel_EVENT_L0] = parallel_P_I_ON_OFF_A;
+	transition_table_parallel[parallel_P_I_ON_OFF_A][parallel_EVENT_L1] = parallel_P_I_ON_ON_A;
+	transition_table_parallel[parallel_P_I_ON_OFF_A][parallel_EVENT_O0] = parallel_P_I_OFF_OFF_A;
+	transition_table_parallel[parallel_P_I_ON_OFF_A][parallel_EVENT_P1] = parallel_P_P_ON_OFF_A;
+	transition_table_parallel[parallel_P_I_ON_OFF_A][parallel_EVENT_S] = parallel_P_I_ON_OFF_S;
+	transition_table_parallel[parallel_P_I_ON_OFF_S][parallel_EVENT_A] = parallel_P_I_ON_OFF_A;
+	transition_table_parallel[parallel_P_I_ON_OFF_S][parallel_EVENT_I0] = parallel_I_I_OFF_OFF_S;
+	transition_table_parallel[parallel_P_I_ON_OFF_S][parallel_EVENT_L0] = parallel_P_I_ON_OFF_S;
+	transition_table_parallel[parallel_P_I_ON_OFF_S][parallel_EVENT_L1] = parallel_P_I_ON_ON_S;
+	transition_table_parallel[parallel_P_I_ON_OFF_S][parallel_EVENT_O0] = parallel_P_I_OFF_OFF_S;
+	transition_table_parallel[parallel_P_I_ON_OFF_S][parallel_EVENT_P1] = parallel_P_P_ON_OFF_S;
+	transition_table_parallel[parallel_P_I_ON_ON_A][parallel_EVENT_I0] = parallel_I_I_OFF_ON_A;
+	transition_table_parallel[parallel_P_I_ON_ON_A][parallel_EVENT_L0] = parallel_P_I_ON_ON_A;
+	transition_table_parallel[parallel_P_I_ON_ON_A][parallel_EVENT_L1] = parallel_P_I_ON_ON_A;
+	transition_table_parallel[parallel_P_I_ON_ON_A][parallel_EVENT_O0] = parallel_P_I_OFF_ON_A;
+	transition_table_parallel[parallel_P_I_ON_ON_A][parallel_EVENT_O1] = parallel_P_I_ON_OFF_A;
+	transition_table_parallel[parallel_P_I_ON_ON_A][parallel_EVENT_P1] = parallel_P_P_ON_OFF_A;
+	transition_table_parallel[parallel_P_I_ON_ON_A][parallel_EVENT_S] = parallel_P_I_ON_ON_S;
+	transition_table_parallel[parallel_P_I_ON_ON_S][parallel_EVENT_A] = parallel_P_I_ON_ON_A;
+	transition_table_parallel[parallel_P_I_ON_ON_S][parallel_EVENT_I0] = parallel_I_I_OFF_ON_S;
+	transition_table_parallel[parallel_P_I_ON_ON_S][parallel_EVENT_L0] = parallel_P_I_ON_ON_S;
+	transition_table_parallel[parallel_P_I_ON_ON_S][parallel_EVENT_L1] = parallel_P_I_ON_ON_S;
+	transition_table_parallel[parallel_P_I_ON_ON_S][parallel_EVENT_O0] = parallel_P_I_OFF_ON_S;
+	transition_table_parallel[parallel_P_I_ON_ON_S][parallel_EVENT_O1] = parallel_P_I_ON_OFF_S;
+	transition_table_parallel[parallel_P_I_ON_ON_S][parallel_EVENT_P1] = parallel_P_P_ON_OFF_S;
+	transition_table_parallel[parallel_P_P_OFF_OFF_A][parallel_EVENT_I0] = parallel_I_P_OFF_OFF_A;
+	transition_table_parallel[parallel_P_P_OFF_OFF_A][parallel_EVENT_I1] = parallel_P_I_OFF_OFF_A;
+	transition_table_parallel[parallel_P_P_OFF_OFF_A][parallel_EVENT_L0] = parallel_P_P_ON_OFF_A;
+	transition_table_parallel[parallel_P_P_OFF_OFF_A][parallel_EVENT_L1] = parallel_P_P_OFF_ON_A;
+	transition_table_parallel[parallel_P_P_OFF_OFF_A][parallel_EVENT_S] = parallel_P_P_OFF_OFF_S;
+	transition_table_parallel[parallel_P_P_OFF_OFF_S][parallel_EVENT_A] = parallel_P_P_OFF_OFF_A;
+	transition_table_parallel[parallel_P_P_OFF_OFF_S][parallel_EVENT_I0] = parallel_I_P_OFF_OFF_S;
+	transition_table_parallel[parallel_P_P_OFF_OFF_S][parallel_EVENT_I1] = parallel_P_I_OFF_OFF_S;
+	transition_table_parallel[parallel_P_P_OFF_OFF_S][parallel_EVENT_L0] = parallel_P_P_ON_OFF_S;
+	transition_table_parallel[parallel_P_P_OFF_OFF_S][parallel_EVENT_L1] = parallel_P_P_OFF_ON_S;
+	transition_table_parallel[parallel_P_P_OFF_ON_A][parallel_EVENT_I0] = parallel_I_P_OFF_ON_A;
+	transition_table_parallel[parallel_P_P_OFF_ON_A][parallel_EVENT_I1] = parallel_P_I_OFF_OFF_A;
+	transition_table_parallel[parallel_P_P_OFF_ON_A][parallel_EVENT_L0] = parallel_P_P_ON_ON_A;
+	transition_table_parallel[parallel_P_P_OFF_ON_A][parallel_EVENT_L1] = parallel_P_P_OFF_ON_A;
+	transition_table_parallel[parallel_P_P_OFF_ON_A][parallel_EVENT_O1] = parallel_P_P_OFF_OFF_A;
+	transition_table_parallel[parallel_P_P_OFF_ON_A][parallel_EVENT_S] = parallel_P_P_OFF_ON_S;
+	transition_table_parallel[parallel_P_P_OFF_ON_S][parallel_EVENT_A] = parallel_P_P_OFF_ON_A;
+	transition_table_parallel[parallel_P_P_OFF_ON_S][parallel_EVENT_I0] = parallel_I_P_OFF_ON_S;
+	transition_table_parallel[parallel_P_P_OFF_ON_S][parallel_EVENT_I1] = parallel_P_I_OFF_OFF_S;
+	transition_table_parallel[parallel_P_P_OFF_ON_S][parallel_EVENT_L0] = parallel_P_P_ON_ON_S;
+	transition_table_parallel[parallel_P_P_OFF_ON_S][parallel_EVENT_L1] = parallel_P_P_OFF_ON_S;
+	transition_table_parallel[parallel_P_P_OFF_ON_S][parallel_EVENT_O1] = parallel_P_P_OFF_OFF_S;
+	transition_table_parallel[parallel_P_P_ON_OFF_A][parallel_EVENT_I0] = parallel_I_P_OFF_OFF_A;
+	transition_table_parallel[parallel_P_P_ON_OFF_A][parallel_EVENT_I1] = parallel_P_I_ON_OFF_A;
+	transition_table_parallel[parallel_P_P_ON_OFF_A][parallel_EVENT_L0] = parallel_P_P_ON_OFF_A;
+	transition_table_parallel[parallel_P_P_ON_OFF_A][parallel_EVENT_L1] = parallel_P_P_ON_ON_A;
+	transition_table_parallel[parallel_P_P_ON_OFF_A][parallel_EVENT_O0] = parallel_P_P_OFF_OFF_A;
+	transition_table_parallel[parallel_P_P_ON_OFF_A][parallel_EVENT_S] = parallel_P_P_ON_OFF_S;
+	transition_table_parallel[parallel_P_P_ON_OFF_S][parallel_EVENT_A] = parallel_P_P_ON_OFF_A;
+	transition_table_parallel[parallel_P_P_ON_OFF_S][parallel_EVENT_I0] = parallel_I_P_OFF_OFF_S;
+	transition_table_parallel[parallel_P_P_ON_OFF_S][parallel_EVENT_I1] = parallel_P_I_ON_OFF_S;
+	transition_table_parallel[parallel_P_P_ON_OFF_S][parallel_EVENT_L0] = parallel_P_P_ON_OFF_S;
+	transition_table_parallel[parallel_P_P_ON_OFF_S][parallel_EVENT_L1] = parallel_P_P_ON_ON_S;
+	transition_table_parallel[parallel_P_P_ON_OFF_S][parallel_EVENT_O0] = parallel_P_P_OFF_OFF_S;
+	transition_table_parallel[parallel_P_P_ON_ON_A][parallel_EVENT_I0] = parallel_I_P_OFF_ON_A;
+	transition_table_parallel[parallel_P_P_ON_ON_A][parallel_EVENT_I1] = parallel_P_I_ON_OFF_A;
+	transition_table_parallel[parallel_P_P_ON_ON_A][parallel_EVENT_L0] = parallel_P_P_ON_ON_A;
+	transition_table_parallel[parallel_P_P_ON_ON_A][parallel_EVENT_L1] = parallel_P_P_ON_ON_A;
+	transition_table_parallel[parallel_P_P_ON_ON_A][parallel_EVENT_O0] = parallel_P_P_OFF_ON_A;
+	transition_table_parallel[parallel_P_P_ON_ON_A][parallel_EVENT_O1] = parallel_P_P_ON_OFF_A;
+	transition_table_parallel[parallel_P_P_ON_ON_A][parallel_EVENT_S] = parallel_P_P_ON_ON_S;
+	transition_table_parallel[parallel_P_P_ON_ON_S][parallel_EVENT_A] = parallel_P_P_ON_ON_A;
+	transition_table_parallel[parallel_P_P_ON_ON_S][parallel_EVENT_I0] = parallel_I_P_OFF_ON_S;
+	transition_table_parallel[parallel_P_P_ON_ON_S][parallel_EVENT_I1] = parallel_P_I_ON_OFF_S;
+	transition_table_parallel[parallel_P_P_ON_ON_S][parallel_EVENT_L0] = parallel_P_P_ON_ON_S;
+	transition_table_parallel[parallel_P_P_ON_ON_S][parallel_EVENT_L1] = parallel_P_P_ON_ON_S;
+	transition_table_parallel[parallel_P_P_ON_ON_S][parallel_EVENT_O0] = parallel_P_P_OFF_ON_S;
+	transition_table_parallel[parallel_P_P_ON_ON_S][parallel_EVENT_O1] = parallel_P_P_ON_OFF_S;
+}
+

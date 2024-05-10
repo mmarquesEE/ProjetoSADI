@@ -9,9 +9,12 @@
 #ifndef _USART_H_
 #define _USART_H_
 
+
 #include <avr/io.h>
 
-extern unsigned long f_cpu;
+#ifndef F_CPU
+#define F_CPU 16000000UL
+#endif
 
 void usart_init(void);
 void usart_write(char data);

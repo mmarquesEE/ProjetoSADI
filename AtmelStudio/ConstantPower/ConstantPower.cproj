@@ -186,12 +186,6 @@
     <Compile Include="myDrivers\usart.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="myDrivers\utils.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="myDrivers\utils.h">
-      <SubType>compile</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="myDrivers" />

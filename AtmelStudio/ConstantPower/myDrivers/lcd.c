@@ -5,11 +5,8 @@
  *  Author: mateu
  */ 
 
-#include <avr/io.h>
-#include "lcd.h"
 
-#define F_CPU 8000000UL
-#include <util/delay.h>
+#include "lcd.h"
 
 void lcd_toggle(void)
 {

@@ -9,7 +9,7 @@
 
 void usart_init(void)
 {
-	unsigned int ubrr = f_cpu/16/9600 - 1;
+	unsigned int ubrr = F_CPU/16/9600 - 1;
 	
 	// Set baud rate
 	UBRR0H = (unsigned char) (ubrr>>8);

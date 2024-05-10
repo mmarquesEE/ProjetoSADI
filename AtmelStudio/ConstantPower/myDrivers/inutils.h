@@ -15,10 +15,10 @@
 
 int parse_commands(
 	char *input,
-	volatile char * ch_mode,
-	volatile uint16_t * ch_lvl,
+	volatile char ch_mode[2],
+	volatile uint16_t ch_lvl[2],
 	volatile uint32_t ch_list[MAX_LIST_LEN][2][2],
-	volatile uint8_t * start_list
+	volatile uint8_t start_list[2]
 );
 
 

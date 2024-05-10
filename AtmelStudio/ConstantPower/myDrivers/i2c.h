@@ -9,8 +9,13 @@
 #ifndef I2C_H_
 #define I2C_H_
 
+
 #include <avr/io.h>
 #include <util/twi.h>
+
+#ifndef F_CPU
+#define F_CPU 16000000UL 
+#endif
 
 void i2c_init(unsigned long fscl);
 int i2c_start(uint8_t address);

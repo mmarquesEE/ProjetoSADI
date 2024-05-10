@@ -14,5 +14,3 @@ myDrivers\lcd.c
 
 myDrivers\usart.c
 
-myDrivers\utils.c
-

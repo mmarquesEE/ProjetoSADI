@@ -1,12 +1,12 @@
 const zmq = require("zeromq");
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 
 let mainWindow;
 
 async function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
-        height: 450,
+        height: 550,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -38,6 +38,27 @@ function setupIpcListeners() {
         await client.send(JSON.stringify(args));
         const [reply] = await client.receive();
         return JSON.parse(reply.toString());
+    });
+    ipcMain.handle("open-csv-dialog", async () => {
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+            properties: ["openFile"],
+            filters: [{ name: "CSV Files", extensions: ["csv"] }],
+        });
+        if (canceled) {
+            return;
+        } else {
+            return filePaths[0]; // retorna o caminho do arquivo selecionado
+        }
+    });
+    ipcMain.handle("save-csv-dialog", async () => {
+        const { filePath } = await dialog.showSaveDialog({
+            filters: [{ name: "CSV Files", extensions: ["csv"] }],
+        });
+        if (filePath.canceled) {
+            return;
+        } else {
+            return filePath.toString(); // retorna o caminho do arquivo selecionado
+        }
     });
 }
 

@@ -43,8 +43,7 @@ C_SRCS +=  \
 ../myDrivers/dac.c \
 ../myDrivers/i2c.c \
 ../myDrivers/lcd.c \
-../myDrivers/usart.c \
-../myDrivers/utils.c
+../myDrivers/usart.c
 
 
 PREPROCESSING_SRCS += 
@@ -59,8 +58,7 @@ myDrivers/adc.o \
 myDrivers/dac.o \
 myDrivers/i2c.o \
 myDrivers/lcd.o \
-myDrivers/usart.o \
-myDrivers/utils.o
+myDrivers/usart.o
 
 OBJS_AS_ARGS +=  \
 main.o \
@@ -68,8 +66,7 @@ myDrivers/adc.o \
 myDrivers/dac.o \
 myDrivers/i2c.o \
 myDrivers/lcd.o \
-myDrivers/usart.o \
-myDrivers/utils.o
+myDrivers/usart.o
 
 C_DEPS +=  \
 main.d \
@@ -77,8 +74,7 @@ myDrivers/adc.d \
 myDrivers/dac.d \
 myDrivers/i2c.d \
 myDrivers/lcd.d \
-myDrivers/usart.d \
-myDrivers/utils.d
+myDrivers/usart.d
 
 C_DEPS_AS_ARGS +=  \
 main.d \
@@ -86,8 +82,7 @@ myDrivers/adc.d \
 myDrivers/dac.d \
 myDrivers/i2c.d \
 myDrivers/lcd.d \
-myDrivers/usart.d \
-myDrivers/utils.d
+myDrivers/usart.d
 
 OUTPUT_FILE_PATH +=ConstantPower.elf
 
@@ -139,13 +134,6 @@ myDrivers/lcd.o: ../myDrivers/lcd.c
 	
 
 myDrivers/usart.o: ../myDrivers/usart.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler : 5.4.0
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\include"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega328p" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-myDrivers/utils.o: ../myDrivers/utils.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\include"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega328p" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

@@ -10,6 +10,14 @@
 #define LCD_H_
 
 
+#include <avr/io.h>
+
+#ifndef F_CPU
+#define F_CPU 16000000UL
+#endif
+
+#include <util/delay.h>
+
 void i2c_init(unsigned long fscl);
 int i2c_start(uint8_t address);
 void i2c_stop(void);

@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Esconde a barra de rolagem por padrão */
+.scrollable-area::-webkit-scrollbar {
+    width: 0; /* Esconde a barra de rolagem vertical */
+    height: 0; /* Esconde a barra de rolagem horizontal */
+}
+
+/* Mostra a barra de rolagem quando o mouse passa sobre o elemento */
+.scrollable-area:hover::-webkit-scrollbar {
+    width: 12px; /* Largura desejada para a barra de rolagem vertical */
+    height: 12px; /* Altura desejada para a barra de rolagem horizontal */
+}
+
+.scrollable-area::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Cor de fundo da trilha */
+}
+
+.scrollable-area::-webkit-scrollbar-thumb {
+    background-color: #888; /* Cor do manipulador da barra de rolagem */
+    border-radius: 6px; /* Borda arredondada do manipulador */
+    border: 3px solid #f0f0f0; /* Borda e cor da borda */
+}
+
+.scrollable-area:hover::-webkit-scrollbar-thumb {
+    background: #555; /* Cor do manipulador ao passar o mouse */
+}
