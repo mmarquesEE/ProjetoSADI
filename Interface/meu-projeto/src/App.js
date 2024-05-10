@@ -87,7 +87,7 @@ function App() {
         <div className=" w-screen h-full min-h-screen  bg-slate-700 text-slate-400 font-thin p-10 flex flex-col items-center">
             <h1 className="text-3xl mr-auto">SDCB</h1>
             <h2 className="text-sm mr-auto">
-                Sistema de Descarga Controlada de Barterias
+                Sistema de Descarga Controlada de Baterias
             </h2>
             <div className="mt-10 w-full max-w-[850px] flex flex-col items-center gap-5">
                 <div className="w-full flex flex-row gap-5 items-center">
